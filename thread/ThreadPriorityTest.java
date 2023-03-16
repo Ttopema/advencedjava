@@ -1,6 +1,6 @@
 package thread;
 
-class MyThread extends Thread{
+class MyThread extends Thread {
 
 	@Override
 	public void run() {
@@ -9,20 +9,21 @@ class MyThread extends Thread{
 		}
 		System.out.println(getName() + "쓰레드의 우선순위 : " + getPriority());
 	}
-	
+
 }
+
 public class ThreadPriorityTest {
 	public static void main(String[] args) {
-		//숫자가 클 수록 우선순위가 높다.
-		System.out.println(Thread.MAX_PRIORITY); //시간분배를 더해서 우선순위로 사용을 하겠다는 의미.
+		// 숫자가 클 수록 우선순위가 높다.
+		System.out.println(Thread.MAX_PRIORITY); // 시간분배를 더해서 우선순위로 사용을 하겠다는 의미.
 		System.out.println(Thread.NORM_PRIORITY);
 		System.out.println(Thread.MIN_PRIORITY);
-		
-		//CPU의 성능을 판단하는 기준 중 하나가 코어의 수
-		//							   --------
-		//							   연산을 여러 개의 코어가 처리하기 때문에 훨씬 빠르게 처리할 수 있음.
+
+		// CPU의 성능을 판단하는 기준 중 하나가 코어의 수
+		// --------
+		// 연산을 여러 개의 코어가 처리하기 때문에 훨씬 빠르게 처리할 수 있음.
 		System.out.println("코어수 : " + Runtime.getRuntime().availableProcessors());
-		
+
 		for (int i = 1; i <= 3; i++) {
 			MyThread t1 = new MyThread();
 			t1.start();
@@ -36,12 +37,12 @@ public class ThreadPriorityTest {
 			MyThread t = new MyThread();
 			t.setName("t" + i);
 			t.start();
-			if(i==7) {
+			if (i == 7) {
 				t.setPriority(Thread.MAX_PRIORITY);
 			}
 			t.start();
 		}
-		
+
 	}
 
 }
