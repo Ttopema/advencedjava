@@ -25,7 +25,7 @@ public class EchoClientExam02 {
 			String fromServer_reMsg = "";
 			while((toServer_sendMsg=keyin.readLine()) != null) {
 				//서버에게로 out
-				toServer_sendMsg = keyin.readLine();
+//				toServer_sendMsg = keyin.readLine(); // in인데?
 				out.println(toServer_sendMsg);
 				//서버로부터 in
 				fromServer_reMsg = in.readLine();
