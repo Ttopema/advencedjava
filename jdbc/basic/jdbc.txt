@@ -1,0 +1,177 @@
+JDBC(Java Database Connectivity)
+=> 자바로 DBMS를 연동하기 위한 기술
+=> 자바프로그램에서 sql문을 실행하기 위해서 사용하는 기술
+
+
+<<DBMS접속해서 JDBC를 사용하기 전에 해야할 일>>
+1. 드라이버를 제조사 홈페이지에서 다운로드
+
+mysql
+https://downloads.mysql.com/archives/c-j/ 사이트에서 버전별로 다운로드
+들어가면 jar파일 바로 있는 거 보일거임.
+
+
+오라클
+설치폴더에서 사용하거나 www.oracle.com 사이트에서 다운로드
+C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib의 ojdbc6.jar파일
+
+2.JVM이 인식할 수 있는 위치포 드라이버를 가져오기 - (Application인 경우 web은 다르게 작업)
+=>jdbc코드를 실행하기 위해서 JVM이 찾을 수 있는 위치에 있어야 한다.
+  ***(사진참조) 파일에서 오른쪽 클릭 빌드패스 --> 컨피그 빌드패스 --> 라이브러리 --> 클래스 패스 --> 오른쪽에 애드 익스터널 자르 클릭한다음 다운받은 자르파일 선택 
+  1)작업할 프로젝트를 선택
+  
+  <<JDBC>>
+  1. 드라이버로딩
+    =>드라이버안에 클래스들이 패키지에 저장되어 있으므로 모두 로딩하지 않고 핵심클래스만 메모리에 로딩
+    => java.lang패키지의 Class라는 클래스의 forName이라는 메소드를 이용해서 jdbc드라이버의 핵심클래스를 메모리에 로딩
+       핵심클래스는 드라이버클래스라 하며 이 드라이버 클래스는 어떤 DMBS를(버전에 따라서도 달라짐) 이용하냐에 따라 달라진다.
+       [mysql]
+       구버전
+       com.mysql.jdbc.Driver
+       
+       신버전
+       com.mysql.cj.jdbc.Driver
+       
+       [오라클]
+       oracle.jdbc.driver.OracleDriver
+       
+       
+       [문법]
+       Class.forName("JDBC드라이버의 핵심클래스명");
+       				 -----------------------
+       				 패키지명까지 명시
+       Class.forName("com.mysql.cj.jdbc.Driver");
+       Class.forName(" oracle.jdbc.driver.OracleDriver");					 
+  
+  2. DB서버에 연결하기
+  =>java.sql패키지의 DriverManager클래스를 이용해서 DB서버에 연결
+  =>DriverManager의 getConnection메소드를 이용해서 DB서버에 연결한다.
+  public static Connection getConnection(String url,
+                                       String user,
+                                       String password)
+                                throws SQLException
+  
+    1)static메소드이므로 클래스 이름으로 액세스해서 사용
+    2)throsw하고 있는 SQLExeption클래스는 Exception의 하위이므로 try~catch를 이용해서 처리해야 한다.
+    3)매개변수
+      url: DB서버에 연결하기 위한 연결문자열(어떤 DBMS에 접속해야 하는지 정보를 담고 있는 문자열 - DBMS에 따라 다르다.)
+           [mysql]
+            jdbc:mysql://ip:port/데이터베이스명
+            ----------   -- ----
+            프로토콜
+                  DBMS가 설치된 서버 ip
+                            DBMS에서 사용하는 포트(mysql - 3306)
+                            
+            
+        ex):jdbc:mysql://10.10.0.120:3306/jdbc
+        ex):jdbc:mysql://10.10.0.120:3306/jdbc?serverTimezone=UTC // 서버시간을 인식하지 못 해서 그런 것이므로 붙여줌
+        
+           [오라클]
+           jdbc:oracle:thin:@ip:port:xe
+                                     ---
+                                     서비스명 express edition버전은 기본이xe
+           
+           jdbc:oracle:thin:@10.10.0.120:1521:xe
+           
+      user:접속할 계정
+      password: 접속할 계정의 패스워드
+      
+    4) 리턴타입
+       => java.sql.Connerction리턴(인터페이스)
+       => getConnection메소드가 정상실행되면 DB서버에 접속이 되고 그 정보가 Connection객체로 만들어져서 리턴
+                                                                -------------
+                                                            어떤 DBMS를 사용하냐에 따라 하위객체가 리턴
+                                                            표준API는 java.sql.Connerction을 리턴한다고 명시되어 있지만
+                                                            어떤 DBMS드라이버가 로딩되어 있냐에 따라 다른 Connection객체가 리턴
+                                                            리턴객체의 다형성이 적용되어 있다.
+                                                            mysql의 드라이버가 로딩되어 있으면 mysql의 연결정보를 담고 있는 객체가 리턴되고
+                                                            오라클 드라이버가 로딩되어 있으면 오라클의 연결정보를 담고 있는 객체가 리턴된다.
+                                                      
+  
+  3.Statement객체 생성
+    => SQL문을 실행할 수 있는 기능을 구현한 클래스
+    => Connerction객체의 메소드를 이용해서 생성
+    [상속구조]
+    +--------------+
+    | Statement    |      -정적 SQL문을 실행할 때 사용(보안취약)
+    +--------------+
+    	    ^
+    	    |
+    +---------------------+
+    | preparedStatement   |       - 동적SQL문을 실행할 때 사용(시큐어코딩에 적합한 방식, 캐시사용)
+    +---------------------+
+      	    ^
+      	    |
+    +---------------------+
+    | CallableStantment   |       - 각 DBMS에 특화된 SQL문을 실행하기 위해 사용하는 객체
+    +---------------------+
+    
+    
+    1)Statement객체를 이용하기
+      Cpmmection객체가 가지고 있는 createStatement메소드를 이용해서 생성
+      [형식]
+      Statement stmt = con.reateStatement()
+      
+      => Statement객체는 어떤 드라이버가 로딩되어 있냐에 따라 다른 객체가 리턴되어짐
+      
+      
+      
+      
+    2)PreparedStatement객체를 이용하기
+    
+  4.SQL문 실행하기
+    1)Statement를 사용
+      -1. executeUpdate : insert, update, delete명령문을 실행
+                          매개변수에 전달된 sql문을 실행
+                          실행결과로 몇 개의 row에 되었는지 리턴
+          int result = stmt.executeUpdate(sql문)
+          ----------
+          몇 개의 행이 삽입, 수정, 삭제되었는지 리턴
+      -2. executeQuery : select명령문을 실행
+                         실행한 후 조회된 테이블을 리턴
+                         DBMS에서 조회된 테이블을 자바에서 사용할 수 있도록 만들어서 제공되는 객체가 ResultSet
+                         실제로는 어떤 DBMNS가 사용되냐에 따라 다른 ResultSet객체가 리턴된다.
+                                                       ----------------------
+                                                    리턴될때는 ResultSet의 하위객체가 리턴
+                                                    
+    2)PreparedStatement를 사용
+
+  
+  5.결과에 대한 처리
+    1) insert, delete, update
+       -모두 int를 리턴하며르 동일한 방법으로 처리
+       -리턴되는 값이 0이면 처리되지 않았다는 의미이므로 그에 대한 하결
+     2)select
+       select문을 실행하고 보여지는 2차원 표의 데이터를 자바에서 사용할 수 있도록 만들어진 객체가 ResultSet
+        -executeQuery메소드를 실행하면 결과가 ResultSet이므로 같은 타입의 변수를 선언해서 결과를 참조
+         ResultSet rs = stmt.executeQuery("실행될sql문")
+         
+        -ResultSet내부에 있는 테이블 데이터를 읽기 위해서 ResultSet이 제공하는 메소드를 이용해서 작업
+         ResultSet객체 내부에서 위치값에 대한 정보를 가지고 있는 Cursor객체를 다음 레코드로 이동하면서 데이터를 읽어야 한다.
+        -레코드의 객수만큼 반복 작업을 수행
+        -ResulteSet의 next메소드를 이용해서 다음 레코드로 커서를 이동하여 작업, next메소드는 Cursor를 이동하고 다음 레코드가 있으면 true를 리턴하고
+         없으면 false를 리턴한다.
+        -while(rs.next()) { ==> true/false를 리턴하므로 반복문 중 while문을 이용해서 작업
+             //레코드의 각 컬럼을 읽는다.
+             
+         }
+        -한 번에 하나의 컬럼만 읽을 수 있다.
+        ResultSet의 getXXXX메소드를 이용해서 컬럼값을 읽는다. 컬럼의 타입에 따라서 다른 메소드를 이용.
+        
+        * mysql타입이 char, varchar인 경우 -> java의 String객체
+        getString("컬럼명") or getString(컬럼의 순서를 나타내는 index)
+                                       ------------------------
+                              원본테이블에 정의된 컬럼의 순서가 아니라 조회결과로 만들어진 컬럼의 순서
+        * int -> java의 int
+          getInt
+          
+        * date -> java.sql.Date
+          getDate(컬럼명)      
+          
+          while(rs.next()) { ==> true/false를 리턴하므로 반복문 중 while문을 이용해서 작업
+             sysout(rs.getString("id")) -> id라는 컬럼으로 정의된 컬럼을 조회
+             sysout(rs.getString(3)) -> 조회된 테이블의 3번째 컬럼을 조회 **조회가 되었다는 것은 위에 sql변수로 정의해놓은 쿼리문.                
+                                  
+          
+  6.자원반납
+  
