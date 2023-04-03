@@ -2,7 +2,9 @@ package jdbc.exam.board;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import jdbc.dao.DBUtill;
 
@@ -10,7 +12,7 @@ public class BoardDAOImpl implements BoardDAO {
 
 	@Override
 	public int insert(String id, String title, String content, int hit) {
-		String sql = "insert into tb_board values(?,?,?,sysdate(),0)";
+		String sql = "insert into tb_board values(boardNum, ?, ?, ?, sysdate(), 0)";
 		Connection con = null;
 		PreparedStatement ptmt = null;
 		int result = 0;
@@ -55,6 +57,31 @@ public class BoardDAOImpl implements BoardDAO {
 
 		return result;
 	}
+	public ArrayList<BoardVO> select(){
+		String sql = "select * from tb_board";
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		ResultSet rs = null;
+		ArrayList<BoardVO> boardlist = new ArrayList<>();
+		BoardVO board = null;
+		
+		try {
+			con = DBUtill.getConnect();
+			ptmt = con.prepareStatement(sql);
+			rs = ptmt.executeQuery();
+			while(rs.next()) {
+				board = new BoardVO(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDate(5), rs.getInt(6));
+				boardlist.add(board);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			DBUtill.close(rs, ptmt, con);
+		}
+		
+		return boardlist;
+	}
 
 	@Override
 	public int delete(int boardNum) {
@@ -77,6 +104,60 @@ public class BoardDAOImpl implements BoardDAO {
 		}
 
 		return result;
+	}
+
+	@Override
+	public ArrayList<BoardVO> serch(String title) {
+		String sql = "select boardNum, id, title from tb_board where title like ?";
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		ResultSet rs = null;
+		ArrayList<BoardVO> boardlist = new ArrayList<>();
+		BoardVO board = null;
+		
+		try {
+			con = DBUtill.getConnect();
+			ptmt = con.prepareStatement(sql);
+			ptmt.setString(1, "%" + title + "%");
+			rs = ptmt.executeQuery();
+			while(rs.next()) {
+				board = new BoardVO(rs.getInt(1), rs.getString(2), rs.getString(3));
+				boardlist.add(board);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtill.close(rs, ptmt, con);
+		}
+		
+		return boardlist;
+	}
+
+	@Override
+	public ArrayList<BoardVO> read(int boardNum) {
+		String sql = "select * from tb_board where boardNum = ?";
+		ArrayList<BoardVO> boardlist = new ArrayList<>();
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		ResultSet rs = null;
+		BoardVO board = null;
+		
+		try {
+			con = DBUtill.getConnect();
+			ptmt = con.prepareStatement(sql);
+			ptmt.setInt(1, boardNum);
+			rs = ptmt.executeQuery();
+			while(rs.next()) {
+				board = new BoardVO(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDate(5), rs.getInt(6));
+				boardlist.add(board);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtill.close(rs, ptmt, con);
+		}
+		
+		return boardlist;
 	}
 
 }

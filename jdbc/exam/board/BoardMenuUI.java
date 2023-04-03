@@ -1,4 +1,5 @@
 package jdbc.exam.board;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class BoardMenuUI {
@@ -27,8 +28,12 @@ public class BoardMenuUI {
 		String id = key.next();
 		System.out.print("게시글번호:");
 		int boardNum = key.nextInt();
+		System.out.println("제목수정: ");
+		String title = key.next();
+		System.out.println("내용수정:");
+		String content = key.next();
 		//여기에서 BoardDAO의 메소드를 호출하세요
-		int result = dao.update(id, boardNum, id, id);
+		int result = dao.update(id, boardNum, title, content);
 		if(result > 0) {
 			System.out.println("수정에 성공하였습니다..");
 		}
@@ -55,6 +60,15 @@ public class BoardMenuUI {
 		System.out.print("제목:");
 		String title = key.next();
 		//여기에서 BoardDAO의 메소드를 호출하세요
+		ArrayList<BoardVO> boardlist = dao.serch(title);
+		int size = boardlist.size();
+		for (int i = 0; i < size; i++) {
+			BoardVO board = boardlist.get(i);
+			System.out.print(board.getBoardNum() + "\t");
+			System.out.print(board.getId() + "\t");
+			System.out.print(board.getTitle() + "\t");
+		}
+		
 	}
 	
 	public void readMenu(){
@@ -62,12 +76,34 @@ public class BoardMenuUI {
 		System.out.print("글번호:");
 		int boardNum = key.nextInt();
 		//여기에서 BoardDAO의 메소드를 호출하세요
+		ArrayList<BoardVO> boardlist = dao.read(boardNum);
+		int size = boardlist.size();
+		for (int i = 0; i < size; i++) {
+			BoardVO board = boardlist.get(i);
+			System.out.print(board.getBoardNum() + "\t");
+			System.out.print(board.getId() + "\t");
+			System.out.print(board.getTitle() + "\t");
+			System.out.print(board.getContent() + "\t");
+			System.out.print(board.getRegdate() + "\t");
+			System.out.println(board.getHit() + "\t");
+		}
 		
 	}
 	public void selectMenu(){
 		System.out.println("*******게시글조회********");
 		//여기에서 BoardDAO의 메소드를 호출하세요
-		
+		ArrayList<BoardVO> boardlist = dao.select();
+		int size = boardlist.size();
+		for (int i = 0; i < size; i++) {
+			BoardVO board = boardlist.get(i);
+			System.out.print(board.getBoardNum() + "\t");
+			System.out.print(board.getId() + "\t");
+			System.out.print(board.getTitle() + "\t");
+			System.out.print(board.getContent() + "\t");
+			System.out.print(board.getRegdate() + "\t");
+			System.out.println(board.getHit() + "\t");
+			
+		}
 	}
 }
 
