@@ -1,4 +1,7 @@
 package jdbc.dao;
+
+import java.util.ArrayList;
+
 // JSON 액세스하기 위한 기능
 public class CustomerDAOImpl_JSON implements CustomerDAO {
 
@@ -21,15 +24,33 @@ public class CustomerDAOImpl_JSON implements CustomerDAO {
 	}
 
 	@Override
-	public void select(String addr) {
+	public int insert(CustomerVO customer) {
 		// TODO Auto-generated method stub
-		
+		return 0;
 	}
 
 	@Override
-	public void login(String id, String pass) {
+	public ArrayList<CustomerVO> select(String addr) {
 		// TODO Auto-generated method stub
-		
+		return null;
+	}
+
+	@Override
+	public CustomerVO login(String id, String pass) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<CustomerVO> getMemberList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CustomerVO getCustomerInfo(String id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

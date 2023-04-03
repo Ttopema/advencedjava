@@ -18,16 +18,17 @@ public class DAOTest {
 		System.out.println("원하는 작업을 선택하세요.");
 		int choice = scanner.nextInt();
 		show(choice);
-		
-		
+
 	}
 
 	public static void show(int choice) {
 		MenuUI ui = new MenuUI();
-		switch(choice) {
+		switch (choice) {
 		case 1:
 			ui.insertMenu();
 			break;
+		case 2:
+			ui.getMemberListMenu();
 		case 3:
 			ui.updateMenu();
 			break;
@@ -40,7 +41,9 @@ public class DAOTest {
 		case 6:
 			ui.login();
 			break;
-			
+		case 7:
+			ui.getInfoMenu();
+
 		}
 	}
 }
